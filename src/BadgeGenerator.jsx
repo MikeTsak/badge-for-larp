@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { toPng } from 'html-to-image';
 
-// [CLAN_OPTIONS and POWER_OPTIONS remain exactly the same logically]
+// Pre-configured Clan data
 const CLAN_OPTIONS = {
   'Banu Haqim': { category: 'Lineage', desc: 'Judges of transgression, intellectuals and lawyers, assassins and blood sorcerers...' },
   'Brujah': { category: 'Lineage', desc: 'Fighters against the system, rebels against injustice, petty criminals, raging rabble...' },
@@ -21,6 +21,7 @@ const CLAN_OPTIONS = {
   'Thin-blood': { category: 'Clanless', desc: 'With the thickness of vitae dwindling, the Duskborn are too far removed from Caine to share his curse.' }
 };
 
+// Powered by local Vite Proxies to avoid CORS
 const POWER_OPTIONS = {
   none: { name: 'Empty Slot', img: 'https://placehold.co/150x150/18181b/3f3f46?text=Empty', desc: 'No power selected for this slot.' },
   potence: { name: 'Potence / Protean', img: '/portal-assets/img/disciplines/Potence-rombo.png', desc: 'Fist/Close combat: Gives 5 + Discipline Level MPT.' },
@@ -29,8 +30,8 @@ const POWER_OPTIONS = {
   fortitude: { name: 'Fortitude', img: '/portal-assets/img/disciplines/Fortitude-rombo.png', desc: 'Improves HP or WD: Default + (Fortitude Dots / 2 rounded up).' },
   auspex: { name: 'Auspex', img: '/portal-assets/img/disciplines/Auspex-rombo.png', desc: 'Sensory awareness and extrasensory perception.' },
   obfuscate: { name: 'Obfuscate', img: '/portal-assets/img/disciplines/Obfuscate-rombo.png', desc: 'Allows hiding in plain sight and blending into shadows.' },
-  occult: { name: 'Occult Skill', img: 'https://cdn.discordapp.com/attachments/430366494325735425/1507010379950198874/occult.png?ex=6a105849&is=6a0f06c9&hm=2be5b54b99c54171cae365a7e9f0b96ff74ff4b010d462319e90671b169e05c2&', desc: 'Access to Occult Plot (3:00-4:00 AM). Requires Occult skill >= 3.' },
-  firearms: { name: 'Firearms Skill', img: 'https://cdn.discordapp.com/attachments/430366494325735425/1507010380407247057/firearms.png?ex=6a105849&is=6a0f06c9&hm=f02a17d0ac05595ddb4ffd06b48f6c4d37856562245011afb4cc0965cc05f0ce&', desc: 'Ability to use the Firearms Combat System. Requires Firearms >= 3.' },
+  occult: { name: 'Occult Skill', img: 'https://cdn.discordapp.com/attachments/430366494325735425/1507010379950198874/occult.png', desc: 'Access to Occult Plot (3:00-4:00 AM). Requires Occult skill >= 3.' },
+  firearms: { name: 'Firearms Skill', img: 'https://cdn.discordapp.com/attachments/430366494325735425/1507010380407247057/firearms.png', desc: 'Ability to use the Firearms Combat System. Requires Firearms >= 3.' },
   custom: { name: '★ Custom Upload / URL...', img: '', desc: 'Upload a file directly from your machine or paste a direct link address.' }
 };
 
@@ -51,6 +52,8 @@ const BadgeGenerator = () => {
     customType2: 'upload'
   });
 
+  const [badgeTheme, setBadgeTheme] = useState('dark');
+
   const activePower1 = POWER_OPTIONS[character.powerKey1] || POWER_OPTIONS.none;
   const activePower2 = POWER_OPTIONS[character.powerKey2] || POWER_OPTIONS.none;
   const currentClanInfo = CLAN_OPTIONS[character.clan];
@@ -60,10 +63,6 @@ const BadgeGenerator = () => {
       return slotNum === 1 ? character.customImgUrl1 : character.customImgUrl2;
     }
     return (POWER_OPTIONS[key] || POWER_OPTIONS.none).img;
-  };
-
-  const getPowerName = (key) => {
-    return (POWER_OPTIONS[key] || POWER_OPTIONS.none).name;
   };
 
   const img1 = getPowerImage(character.powerKey1, 1);
@@ -102,24 +101,45 @@ const BadgeGenerator = () => {
       .catch((err) => console.error('Error generating image:', err));
   }, [badgeRef, character.name]);
 
+  // UI Form Classes
   const inputClass = "w-full p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-red-900 focus:ring-1 focus:ring-red-900 transition-colors font-medium";
   const selectClass = "w-full p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-100 focus:outline-none focus:border-red-900 focus:ring-1 focus:ring-red-900 transition-colors text-sm font-medium";
 
-  // CHANGE THIS URL TO YOUR ACTUAL LOGO URL
-  // If you drop a file named 'logo.png' into your public folder, change this to '/logo.png'
-  const LOGO_URL = "https://placehold.co/100x40/18181b/71717a?text=LARP+LOGO&font=serif";
+  // Official ATT LARP Logo (using local proxy to fix CORS)
+  const LOGO_URL = "/attlarp-assets/img/ATT-logo(1).png";
+
+  // Dynamic Theme Variables for the Output Badge
+  const isDark = badgeTheme === 'dark';
+  const tBg = isDark ? 'bg-gradient-to-b from-zinc-800 to-zinc-950 border-zinc-700/50' : 'bg-white border-gray-300';
+  const tInnerBorder = isDark ? 'border-zinc-600/30' : 'border-gray-200';
+  const tHeaderBorder = isDark ? 'border-zinc-700' : 'border-gray-300';
+  const tTextMain = isDark ? 'text-zinc-100' : 'text-gray-900';
+  const tTextSub = isDark ? 'text-zinc-400' : 'text-gray-500';
+  
+  const tDaBlock = isDark ? 'bg-gradient-to-br from-cyan-950 to-slate-950 border-cyan-900/50 text-cyan-50' : 'bg-blue-600 border-blue-700 text-white shadow-inner';
+  const tDaTextSub = isDark ? 'text-cyan-500/80' : 'text-blue-200';
+  const tHpBlock = isDark ? 'bg-gradient-to-br from-rose-950 to-zinc-950 border-rose-900/50 text-rose-50' : 'bg-red-600 border-red-700 text-white shadow-inner';
+  const tHpTextSub = isDark ? 'text-rose-500/80' : 'text-red-200';
+
+  const tPowerBlock = isDark ? 'bg-zinc-900/80 border-zinc-700/60 shadow-inner' : 'bg-gray-50 border-gray-300 shadow-sm';
+  const tPowerImgWrap = isDark ? '' : 'bg-white border border-gray-200 rounded p-1 shadow-sm';
+  const tPowerText = isDark ? 'text-zinc-300' : 'text-gray-800';
+  
+  const tFooterBorder = isDark ? 'border-zinc-700/60' : 'border-gray-300';
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-200 py-12 px-4 sm:px-6 font-sans selection:bg-red-900 selection:text-white">
-      <div className="flex flex-col lg:flex-row gap-10 max-w-7xl mx-auto items-start">
+    <div className="min-h-screen bg-zinc-950 text-zinc-200 py-12 px-4 sm:px-6 font-sans selection:bg-red-900 selection:text-white flex flex-col justify-between">
+      <div className="flex flex-col lg:flex-row gap-10 max-w-7xl mx-auto items-start w-full">
         
         {/* LEFT: FORM INPUT CONTROLS */}
         <div className="w-full lg:w-7/12 bg-zinc-900/80 backdrop-blur-sm p-8 rounded-2xl border border-zinc-800 shadow-2xl space-y-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-red-900/10 rounded-full blur-3xl pointer-events-none -mr-10 -mt-10"></div>
           
-          <div className="relative">
-            <h2 className="text-2xl font-serif font-bold text-zinc-100 tracking-wide">Storyteller Vault</h2>
-            <p className="text-sm text-zinc-400 mt-1 uppercase tracking-widest">Digital Badge Forge</p>
+          <div className="relative flex justify-between items-start">
+            <div>
+              <h2 className="text-2xl font-serif font-bold text-zinc-100 tracking-wide">Storyteller Vault</h2>
+              <p className="text-sm text-zinc-400 mt-1 uppercase tracking-widest">Digital Badge Forge</p>
+            </div>
           </div>
           
           <div className="space-y-6 relative">
@@ -234,9 +254,108 @@ const BadgeGenerator = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* RIGHT: LIVE RENDERING BADGE CARD PREVIEW */}
+        <div className="w-full lg:w-5/12 flex flex-col items-center justify-start bg-zinc-900/30 p-8 rounded-2xl border border-dashed border-zinc-800 min-h-[500px]">
+          
+          {/* THEME TOGGLER */}
+          <div className="flex gap-3 items-center mb-6 bg-zinc-950 p-1.5 rounded-lg border border-zinc-800">
+            <button 
+              onClick={() => setBadgeTheme('dark')} 
+              className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-widest transition ${isDark ? 'bg-zinc-800 text-zinc-100 shadow' : 'text-zinc-500 hover:text-zinc-300'}`}
+            >
+              Dark Print
+            </button>
+            <button 
+              onClick={() => setBadgeTheme('light')} 
+              className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-widest transition ${!isDark ? 'bg-zinc-200 text-zinc-900 shadow' : 'text-zinc-500 hover:text-zinc-300'}`}
+            >
+              Light Print
+            </button>
+          </div>
+          
+          {/* THE PHYSICAL BADGE OUTPUT CONTAINER */}
+          <div 
+            ref={badgeRef} 
+            className={`w-[300px] h-[450px] ${tBg} p-4 flex flex-col rounded-xl shadow-2xl border-2 relative overflow-hidden transition-colors duration-300`}
+            style={{ boxSizing: 'border-box' }}
+          >
+            <div className={`absolute inset-1.5 border ${tInnerBorder} rounded-lg pointer-events-none`}></div>
+
+            {/* Header */}
+            <div className={`text-center pb-3 mb-4 mt-2 border-b ${tHeaderBorder} relative z-10`}>
+              <div className={`text-2xl font-serif font-bold tracking-wide ${tTextMain}`}>{character.name}</div>
+              <div className={`text-xs font-serif italic ${tTextSub} mt-1 tracking-widest uppercase`}>{character.clan}</div>
+            </div>
+
+            {/* Grid Frame */}
+            <div className="flex-1 flex flex-col gap-3 relative z-10 px-1">
+              
+              {/* Combat Stats */}
+              <div className="grid grid-cols-2 gap-3 h-24">
+                <div className={`${tDaBlock} p-2 flex flex-col items-center justify-center rounded-lg border`}>
+                  <span className={`text-[9px] font-bold tracking-widest ${tDaTextSub} uppercase mb-0.5`}>DA / WD</span>
+                  <span className="text-3xl font-serif">{character.da}<span className="opacity-50 mx-1 font-sans text-2xl">/</span>{character.wd}</span>
+                </div>
+
+                <div className={`${tHpBlock} p-2 flex flex-col items-center justify-center rounded-lg border`}>
+                  <span className={`text-[9px] font-bold tracking-widest ${tHpTextSub} uppercase mb-0.5`}>Health</span>
+                  <span className="text-4xl font-serif">{character.hp}</span>
+                </div>
+              </div>
+
+              {/* Disciplines */}
+              <div className="grid grid-cols-2 gap-3 flex-1 min-h-0">
+                <div className={`${tPowerBlock} rounded-lg p-2 flex flex-col items-center justify-between overflow-hidden border`}>
+                  <div className={`w-full flex-1 flex items-center justify-center overflow-hidden mb-2 ${tPowerImgWrap}`}>
+                    {img1 ? (
+                      <img src={img1} alt="Power 1" className="max-w-full max-h-full object-contain drop-shadow-sm" crossOrigin="anonymous" />
+                    ) : (
+                      <div className="text-[10px] text-zinc-400 italic">Empty</div>
+                    )}
+                  </div>
+                  <span className={`text-[10px] font-bold tracking-widest text-center truncate w-full uppercase ${tPowerText}`}>
+                    {character.powerKey1 === 'custom' ? 'Custom' : POWER_OPTIONS[character.powerKey1].name.split(' / ')[0]}
+                  </span>
+                </div>
+
+                <div className={`${tPowerBlock} rounded-lg p-2 flex flex-col items-center justify-between overflow-hidden border`}>
+                  <div className={`w-full flex-1 flex items-center justify-center overflow-hidden mb-2 ${tPowerImgWrap}`}>
+                    {img2 ? (
+                      <img src={img2} alt="Power 2" className="max-w-full max-h-full object-contain drop-shadow-sm" crossOrigin="anonymous" />
+                    ) : (
+                      <div className="text-[10px] text-zinc-400 italic">Empty</div>
+                    )}
+                  </div>
+                  <span className={`text-[10px] font-bold tracking-widest text-center truncate w-full uppercase ${tPowerText}`}>
+                    {character.powerKey2 === 'custom' ? 'Custom' : POWER_OPTIONS[character.powerKey2].name.split(' / ')[0]}
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Footer Row */}
+            <div className={`mt-3 pt-3 border-t ${tFooterBorder} flex justify-between items-center px-2 relative z-10`}>
+              <span className={`text-[10px] font-bold tracking-widest ${tTextSub} uppercase`}>S1F</span>
+              
+              <div className="h-6 flex items-center justify-center">
+                <img 
+                  src={LOGO_URL} 
+                  alt="ATT LARP Logo" 
+                  className={`max-h-full max-w-[100px] object-contain ${isDark ? 'opacity-90 drop-shadow-lg' : 'opacity-100'}`}
+                  crossOrigin="anonymous"
+                />
+              </div>
+
+              <span className={`text-[10px] font-bold tracking-wider ${tTextSub} uppercase`}>attlarp.gr</span>
+            </div>
+          </div>
+
           <button 
             onClick={downloadBadge} 
-            className="w-full relative group overflow-hidden bg-zinc-800 text-zinc-100 font-bold py-4 px-4 rounded-xl border border-zinc-700 hover:border-red-900/50 transition-all duration-300 shadow-lg mt-4"
+            className="w-full max-w-[300px] mt-6 relative group overflow-hidden bg-zinc-800 text-zinc-100 font-bold py-4 px-4 rounded-xl border border-zinc-700 hover:border-red-900/50 transition-all duration-300 shadow-lg"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-red-950 to-red-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <span className="relative flex items-center justify-center gap-2">
@@ -246,94 +365,14 @@ const BadgeGenerator = () => {
           </button>
         </div>
 
-        {/* RIGHT: LIVE RENDERING BADGE CARD PREVIEW */}
-        <div className="w-full lg:w-5/12 flex flex-col items-center justify-center bg-zinc-900/30 p-8 rounded-2xl border border-dashed border-zinc-800 min-h-[500px]">
-          <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-6">Live Print Preview</span>
-          
-          {/* THE PHYSICAL BADGE (Increased height slightly to accommodate the footer) */}
-          <div 
-            ref={badgeRef} 
-            className="w-[300px] h-[450px] bg-gradient-to-b from-zinc-800 to-zinc-950 p-4 flex flex-col rounded-xl shadow-2xl border-2 border-zinc-700/50 relative overflow-hidden"
-            style={{ boxSizing: 'border-box' }}
-          >
-            {/* Inner elegant border styling */}
-            <div className="absolute inset-1.5 border border-zinc-600/30 rounded-lg pointer-events-none"></div>
-
-            {/* Badge Header Area */}
-            <div className="text-center pb-3 mb-4 mt-2 border-b border-zinc-700 relative z-10">
-              <div className="text-2xl font-serif font-bold tracking-wide text-zinc-100">{character.name}</div>
-              <div className="text-xs font-serif italic text-zinc-400 mt-1 tracking-widest uppercase">{character.clan}</div>
-            </div>
-
-            {/* 4 Boxes Grid Frame */}
-            <div className="flex-1 flex flex-col gap-3 relative z-10 px-1">
-              
-              {/* Top Layer: Combat Stats */}
-              <div className="grid grid-cols-2 gap-3 h-24">
-                <div className="bg-gradient-to-br from-cyan-950 to-slate-950 p-2 flex flex-col items-center justify-center rounded-lg border border-cyan-900/50 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]">
-                  <span className="text-[9px] font-bold tracking-widest text-cyan-500/80 uppercase mb-0.5">DA / WD</span>
-                  <span className="text-3xl font-serif text-cyan-50">{character.da}<span className="text-cyan-700/50 mx-1 font-sans text-2xl">/</span>{character.wd}</span>
-                </div>
-
-                <div className="bg-gradient-to-br from-rose-950 to-zinc-950 p-2 flex flex-col items-center justify-center rounded-lg border border-rose-900/50 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]">
-                  <span className="text-[9px] font-bold tracking-widest text-rose-500/80 uppercase mb-0.5">Health</span>
-                  <span className="text-4xl font-serif text-rose-50">{character.hp}</span>
-                </div>
-              </div>
-
-              {/* Bottom Layer: Disciplines */}
-              <div className="grid grid-cols-2 gap-3 flex-1 min-h-0">
-                <div className="bg-zinc-900/80 rounded-lg p-2 flex flex-col items-center justify-between overflow-hidden border border-zinc-700/60 shadow-inner">
-                  <div className="w-full flex-1 flex items-center justify-center overflow-hidden mb-2">
-                    {img1 ? (
-                      <img src={img1} alt="Power 1" className="max-w-full max-h-full object-contain drop-shadow-md brightness-110" />
-                    ) : (
-                      <div className="text-[10px] text-zinc-600 italic">Empty</div>
-                    )}
-                  </div>
-                  <span className="text-[10px] font-bold tracking-widest text-center truncate w-full uppercase text-zinc-300">
-                    {character.powerKey1 === 'custom' ? 'Custom' : POWER_OPTIONS[character.powerKey1].name.split(' / ')[0]}
-                  </span>
-                </div>
-
-                <div className="bg-zinc-900/80 rounded-lg p-2 flex flex-col items-center justify-between overflow-hidden border border-zinc-700/60 shadow-inner">
-                  <div className="w-full flex-1 flex items-center justify-center overflow-hidden mb-2">
-                    {img2 ? (
-                      <img src={img2} alt="Power 2" className="max-w-full max-h-full object-contain drop-shadow-md brightness-110" />
-                    ) : (
-                      <div className="text-[10px] text-zinc-600 italic">Empty</div>
-                    )}
-                  </div>
-                  <span className="text-[10px] font-bold tracking-widest text-center truncate w-full uppercase text-zinc-300">
-                    {character.powerKey2 === 'custom' ? 'Custom' : POWER_OPTIONS[character.powerKey2].name.split(' / ')[0]}
-                  </span>
-                </div>
-              </div>
-
-            </div>
-
-            {/* OFFICIAL FOOTER: S1F, Logo, Web Address */}
-            <div className="mt-3 pt-3 border-t border-zinc-700/60 flex justify-between items-center px-2 relative z-10">
-              <span className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">S1F</span>
-              
-              <div className="h-6 flex items-center justify-center">
-                {/* Logo Image */}
-                <img 
-                  src={LOGO_URL} 
-                  alt="ATT LARP Logo" 
-                  className="max-h-full max-w-[80px] object-contain opacity-80 mix-blend-screen"
-                  crossOrigin="anonymous"
-                />
-              </div>
-
-              <span className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase">attlarp.gr</span>
-            </div>
-
-          </div>
-          <p className="mt-6 text-zinc-500 text-xs italic text-center max-w-[300px]">The downloaded image scales automatically to a crisp, print-ready high resolution format.</p>
-        </div>
-
       </div>
+
+      {/* Global Page Footer */}
+      <footer className="mt-16 text-center w-full">
+        <p className="text-xs font-bold tracking-widest uppercase text-zinc-600">
+          Engineered & Crafted by <a href="https://miketsak.gr" target="_blank" rel="noopener noreferrer" className="text-red-800 hover:text-red-500 transition-colors ml-1">miketsak.gr</a>
+        </p>
+      </footer>
     </div>
   );
 };
