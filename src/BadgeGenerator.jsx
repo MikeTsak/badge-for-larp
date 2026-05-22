@@ -21,7 +21,7 @@ const CLAN_OPTIONS = {
   'Thin-blood': { category: 'Clanless', desc: 'With the thickness of vitae dwindling, the Duskborn are too far removed from Caine to share his curse.' }
 };
 
-// Powered by local Vite Proxies to avoid CORS
+// Powered by local proxy for portal assets, and local direct files for Discord/Logo assets
 const POWER_OPTIONS = {
   none: { name: 'Empty Slot', img: 'https://placehold.co/150x150/18181b/3f3f46?text=Empty', desc: 'No power selected for this slot.' },
   potence: { name: 'Potence / Protean', img: '/portal-assets/img/disciplines/Potence-rombo.png', desc: 'Fist/Close combat: Gives 5 + Discipline Level MPT.' },
@@ -30,8 +30,11 @@ const POWER_OPTIONS = {
   fortitude: { name: 'Fortitude', img: '/portal-assets/img/disciplines/Fortitude-rombo.png', desc: 'Improves HP or WD: Default + (Fortitude Dots / 2 rounded up).' },
   auspex: { name: 'Auspex', img: '/portal-assets/img/disciplines/Auspex-rombo.png', desc: 'Sensory awareness and extrasensory perception.' },
   obfuscate: { name: 'Obfuscate', img: '/portal-assets/img/disciplines/Obfuscate-rombo.png', desc: 'Allows hiding in plain sight and blending into shadows.' },
-  occult: { name: 'Occult Skill', img: 'https://cdn.discordapp.com/attachments/430366494325735425/1507010379950198874/occult.png', desc: 'Access to Occult Plot (3:00-4:00 AM). Requires Occult skill >= 3.' },
-  firearms: { name: 'Firearms Skill', img: 'https://cdn.discordapp.com/attachments/430366494325735425/1507010380407247057/firearms.png', desc: 'Ability to use the Firearms Combat System. Requires Firearms >= 3.' },
+  
+  // Using Local Native Images!
+  occult: { name: 'Occult Skill', img: '/img/occult.png', desc: 'Access to Occult Plot (3:00-4:00 AM). Requires Occult skill >= 3.' },
+  firearms: { name: 'Firearms Skill', img: '/img/firearms.png', desc: 'Ability to use the Firearms Combat System. Requires Firearms >= 3.' },
+  
   custom: { name: '★ Custom Upload / URL...', img: '', desc: 'Upload a file directly from your machine or paste a direct link address.' }
 };
 
@@ -73,6 +76,14 @@ const BadgeGenerator = () => {
     setCharacter((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Helper function to handle the +/- buttons
+  const adjustStat = (statName, delta) => {
+    setCharacter((prev) => {
+      const currentVal = parseInt(prev[statName], 10) || 0;
+      return { ...prev, [statName]: String(currentVal + delta) };
+    });
+  };
+
   const handleFileUpload = (e, slotNum) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -105,8 +116,8 @@ const BadgeGenerator = () => {
   const inputClass = "w-full p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-red-900 focus:ring-1 focus:ring-red-900 transition-colors font-medium";
   const selectClass = "w-full p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-100 focus:outline-none focus:border-red-900 focus:ring-1 focus:ring-red-900 transition-colors text-sm font-medium";
 
-  // Official ATT LARP Logo (using local proxy to fix CORS)
-  const LOGO_URL = "/attlarp-assets/img/ATT-logo(1).png";
+  // Official ATT LARP Logo from local files!
+  const LOGO_URL = "/img/att-logo2.png";
 
   // Dynamic Theme Variables for the Output Badge
   const isDark = badgeTheme === 'dark';
@@ -172,19 +183,39 @@ const BadgeGenerator = () => {
               </div>
             )}
 
+            {/* COMBAT STATS - NOW WITH +/- ARROWS */}
             <div className="grid grid-cols-3 gap-5">
+              
+              {/* DA Controls */}
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-cyan-700/80 mb-2">DA (Defense)</label>
-                <input type="text" name="da" value={character.da} onChange={handleInputChange} className={`${inputClass} text-center text-cyan-400 text-xl font-bold`} />
+                <div className="flex bg-zinc-950 border border-zinc-800 rounded-lg focus-within:border-red-900 focus-within:ring-1 focus-within:ring-red-900 transition-colors overflow-hidden">
+                  <button type="button" onClick={() => adjustStat('da', -1)} className="px-3 py-2 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-200 transition text-xl font-black select-none leading-none outline-none">&minus;</button>
+                  <input type="text" name="da" value={character.da} onChange={handleInputChange} className="w-full p-2 bg-transparent text-center text-cyan-400 text-xl font-bold focus:outline-none" />
+                  <button type="button" onClick={() => adjustStat('da', 1)} className="px-3 py-2 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-200 transition text-xl font-black select-none leading-none outline-none">&#43;</button>
+                </div>
               </div>
+
+              {/* WD Controls */}
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-cyan-700/80 mb-2">WD (Willpower)</label>
-                <input type="text" name="wd" value={character.wd} onChange={handleInputChange} className={`${inputClass} text-center text-cyan-400 text-xl font-bold`} />
+                <div className="flex bg-zinc-950 border border-zinc-800 rounded-lg focus-within:border-red-900 focus-within:ring-1 focus-within:ring-red-900 transition-colors overflow-hidden">
+                  <button type="button" onClick={() => adjustStat('wd', -1)} className="px-3 py-2 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-200 transition text-xl font-black select-none leading-none outline-none">&minus;</button>
+                  <input type="text" name="wd" value={character.wd} onChange={handleInputChange} className="w-full p-2 bg-transparent text-center text-cyan-400 text-xl font-bold focus:outline-none" />
+                  <button type="button" onClick={() => adjustStat('wd', 1)} className="px-3 py-2 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-200 transition text-xl font-black select-none leading-none outline-none">&#43;</button>
+                </div>
               </div>
+
+              {/* HP Controls */}
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-rose-700/80 mb-2">HP (Health)</label>
-                <input type="text" name="hp" value={character.hp} onChange={handleInputChange} className={`${inputClass} text-center text-rose-500 text-xl font-bold`} />
+                <div className="flex bg-zinc-950 border border-zinc-800 rounded-lg focus-within:border-red-900 focus-within:ring-1 focus-within:ring-red-900 transition-colors overflow-hidden">
+                  <button type="button" onClick={() => adjustStat('hp', -1)} className="px-3 py-2 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-200 transition text-xl font-black select-none leading-none outline-none">&minus;</button>
+                  <input type="text" name="hp" value={character.hp} onChange={handleInputChange} className="w-full p-2 bg-transparent text-center text-rose-500 text-xl font-bold focus:outline-none" />
+                  <button type="button" onClick={() => adjustStat('hp', 1)} className="px-3 py-2 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-200 transition text-xl font-black select-none leading-none outline-none">&#43;</button>
+                </div>
               </div>
+
             </div>
 
             <div className="h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent my-4"></div>
