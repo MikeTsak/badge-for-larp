@@ -1,6 +1,14 @@
-# LARP Badge Generator
+<div align="center">
+  <h1>🏷️ LARP Badge Generator</h1>
+  <p><strong>Current Version: 1.0.0</strong></p>
 
-A tool for generating printable badges for Vampire: The Masquerade LARP events. Customize your Kindred's name, clan, stats (DA, WD, HP), and two discipline powers (with optional custom image uploads) to create a personalized badge.
+  <p>
+    <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+    <img src="https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge" alt="License" />
+  </p>
+
+  <p><em>A tool for generating printable badges for Vampire: The Masquerade LARP events. Customize your Kindred's name, clan, stats (DA, WD, HP), and two discipline powers (with optional custom image uploads) to create a personalized badge.</em></p>
+</div>
 
 ## Features
 - Character Name Input
